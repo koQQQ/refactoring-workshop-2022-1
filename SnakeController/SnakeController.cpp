@@ -80,6 +80,7 @@ void changePositionCoords(DisplayInd& fist, const std::pair<int,int>& second, Ce
     m_displayPort.send(std::make_unique<EventT<DisplayInd>>(fist));
 }
 
+
 void Controller::receive(std::unique_ptr<Event> e)
 {
     try {
@@ -87,12 +88,9 @@ void Controller::receive(std::unique_ptr<Event> e)
 
         Segment const& currentHead = m_segments.front();
 
-        auto CastOnInt_1 = static_cast<int>(1);
-        auto CastOnInt_2 = static_cast<int>(2);
-
         Segment newHead;
-        newHead.x = currentHead.x + ((m_currentDirection & CastOnInt_1) ? (m_currentDirection & CastOnInt_2) ? 1 : -1 : 0);
-        newHead.y = currentHead.y + (not (m_currentDirection & CastOnInt_1) ? (m_currentDirection & CastOnInt_2) ? 1 : -1 : 0);
+        newHead.x = currentHead.x + ((m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
+        newHead.y = currentHead.y + (not (m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
         newHead.ttl = currentHead.ttl;
 
         bool lost = false;
@@ -104,6 +102,7 @@ void Controller::receive(std::unique_ptr<Event> e)
                 break;
             }
         }
+
 
         if (not lost) {
             if (std::make_pair(newHead.x, newHead.y) == m_foodPosition) {
@@ -142,9 +141,7 @@ void Controller::receive(std::unique_ptr<Event> e)
         try {
             auto direction = dynamic_cast<EventT<DirectionInd> const&>(*e)->direction;
 
-            auto CastOnInt_1 = static_cast<int>(1);
-
-            if ((m_currentDirection & CastOnInt_1) != (direction & CastOnInt_1)) {
+            if ((m_currentDirection & 0b01) != (direction & 0b01)) {
                 m_currentDirection = direction;
             }
         } catch (std::bad_cast&) {
