@@ -63,19 +63,21 @@ Controller::Controller(IPort& p_displayPort, IPort& p_foodPort, IPort& p_scorePo
     }
 }
 template<typename U> 
-void changePositionCoords(DisplayInd& fist, const U& second, Cell three)
+void changePositionCoords(DisplayInd& fist, const U& second, Cell three, IPort& m_displayPort)
 {
     fist.x = second.x;
     fist.y = second.y;
     fist.value = three;
+    m_displayPort.send(std::make_unique<EventT<DisplayInd>>(fist));
 }
 
 template<> 
-void changePositionCoords(DisplayInd& fist, const std::pair<int,int>& second, Cell three)
+void changePositionCoords(DisplayInd& fist, const std::pair<int,int>& second, Cell three, IPort& m_displayPort)
 {
     fist.x = second.first;
     fist.y = second.second;
     fist.value = three;
+    m_displayPort.send(std::make_unique<EventT<DisplayInd>>(fist));
 }
 
 void Controller::receive(std::unique_ptr<Event> e)
@@ -116,9 +118,8 @@ void Controller::receive(std::unique_ptr<Event> e)
                 for (auto &segment : m_segments) {
                     if (not --segment.ttl) {
                         DisplayInd l_evt;
-                        changePositionCoords(l_evt, segment, Cell_FREE);
+                        changePositionCoords(l_evt, segment, Cell_FREE, m_displayPort);
 
-                        m_displayPort.send(std::make_unique<EventT<DisplayInd>>(l_evt));
                     }
                 }
             }
@@ -127,9 +128,8 @@ void Controller::receive(std::unique_ptr<Event> e)
         if (not lost) {
             m_segments.push_front(newHead);
             DisplayInd placeNewHead;
-            changePositionCoords(placeNewHead, newHead, Cell_SNAKE);
+            changePositionCoords(placeNewHead, newHead, Cell_SNAKE, m_displayPort);
 
-            m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewHead));
 
             m_segments.erase(
                 std::remove_if(
@@ -163,12 +163,10 @@ void Controller::receive(std::unique_ptr<Event> e)
                     m_foodPort.send(std::make_unique<EventT<FoodReq>>());
                 } else {
                     DisplayInd clearOldFood;
-                    changePositionCoords(clearOldFood, m_foodPosition, Cell_FREE);
-                    m_displayPort.send(std::make_unique<EventT<DisplayInd>>(clearOldFood));
+                    changePositionCoords(clearOldFood, m_foodPosition, Cell_FREE, m_displayPort);
 
                     DisplayInd placeNewFood;
-                    changePositionCoords(placeNewFood, receivedFood, Cell_FOOD);
-                    m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewFood));
+                    changePositionCoords(placeNewFood, receivedFood, Cell_FOOD, m_displayPort);
                 }
 
                 m_foodPosition = std::make_pair(receivedFood.x, receivedFood.y);
