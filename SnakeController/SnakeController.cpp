@@ -62,6 +62,13 @@ Controller::Controller(IPort& p_displayPort, IPort& p_foodPort, IPort& p_scorePo
         throw ConfigurationError();
     }
 }
+template<typename U> 
+void changePositionCoords(DisplayInd& fist, const U& second, Cell three)
+{
+    fist.x = second.x;
+    fist.y = second.y;
+    fist.value = three;
+}
 
 void Controller::receive(std::unique_ptr<Event> e)
 {
@@ -70,12 +77,12 @@ void Controller::receive(std::unique_ptr<Event> e)
 
         Segment const& currentHead = m_segments.front();
 
-        auto StaticCastOnInt_0b01 = static_cast<int>(1);
-        auto StaticCastOnInt_0b10 = static_cast<int>(2);
+        auto CastOnInt_1 = static_cast<int>(1);
+        auto CastOnInt_2 = static_cast<int>(2);
 
         Segment newHead;
-        newHead.x = currentHead.x + ((m_currentDirection & StaticCastOnInt_0b01) ? (m_currentDirection & StaticCastOnInt_0b10) ? 1 : -1 : 0);
-        newHead.y = currentHead.y + (not (m_currentDirection & StaticCastOnInt_0b01) ? (m_currentDirection & StaticCastOnInt_0b10) ? 1 : -1 : 0);
+        newHead.x = currentHead.x + ((m_currentDirection & CastOnInt_1) ? (m_currentDirection & CastOnInt_2) ? 1 : -1 : 0);
+        newHead.y = currentHead.y + (not (m_currentDirection & CastOnInt_1) ? (m_currentDirection & CastOnInt_2) ? 1 : -1 : 0);
         newHead.ttl = currentHead.ttl;
 
         bool lost = false;
@@ -101,9 +108,10 @@ void Controller::receive(std::unique_ptr<Event> e)
                 for (auto &segment : m_segments) {
                     if (not --segment.ttl) {
                         DisplayInd l_evt;
-                        l_evt.x = segment.x;
-                        l_evt.y = segment.y;
-                        l_evt.value = Cell_FREE;
+                        changePositionCoords(l_evt, segment, Cell_FREE);
+                        // l_evt.x = segment.x;
+                        // l_evt.y = segment.y;
+                        // l_evt.value = Cell_FREE;
 
                         m_displayPort.send(std::make_unique<EventT<DisplayInd>>(l_evt));
                     }
@@ -131,7 +139,9 @@ void Controller::receive(std::unique_ptr<Event> e)
         try {
             auto direction = dynamic_cast<EventT<DirectionInd> const&>(*e)->direction;
 
-            if ((m_currentDirection & 0b01) != (direction & 0b01)) {
+            auto CastOnInt_1 = static_cast<int>(1);
+
+            if ((m_currentDirection & CastOnInt_1) != (direction & CastOnInt_1)) {
                 m_currentDirection = direction;
             }
         } catch (std::bad_cast&) {
