@@ -70,9 +70,12 @@ void Controller::receive(std::unique_ptr<Event> e)
 
         Segment const& currentHead = m_segments.front();
 
+        auto StaticCastOnInt_0b01 = static_cast<int>(1);
+        auto StaticCastOnInt_0b10 = static_cast<int>(2);
+
         Segment newHead;
-        newHead.x = currentHead.x + ((m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
-        newHead.y = currentHead.y + (not (m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
+        newHead.x = currentHead.x + ((m_currentDirection & StaticCastOnInt_0b01) ? (m_currentDirection & StaticCastOnInt_0b10) ? 1 : -1 : 0);
+        newHead.y = currentHead.y + (not (m_currentDirection & StaticCastOnInt_0b01) ? (m_currentDirection & StaticCastOnInt_0b10) ? 1 : -1 : 0);
         newHead.ttl = currentHead.ttl;
 
         bool lost = false;
