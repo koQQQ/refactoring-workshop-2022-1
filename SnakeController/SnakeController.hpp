@@ -54,8 +54,15 @@ private:
     void set_direction(const Direction &direction);
     void FoodRespPosition(const FoodResp &requestedFood);
     void CheckSnakeEatsFood(const FoodInd &receivedFood);
+    void MoveSnake();
+    void placeNewHead(const Segment& newHead);
+    void GenerateNewHead(const Segment &currentHead, Segment& newHead);
+    void ConfigurationGame(std::string const& p_config);
+    void ChooseDirection(char &d);
     bool CollisionWithMyself(const Segment &newhead);
-    bool ControllWeHitSomeoneIfNotChangeCoords(Segment& newHead);
+    bool ControllWhereWeAre(const Segment& newHead);
+    bool CheckHitFood(const Segment& newHead);
+    bool CheckWeHitCornerOfMap(const Segment& newHead);
 };
 
 } // namespace Snake
