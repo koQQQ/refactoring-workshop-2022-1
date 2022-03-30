@@ -49,6 +49,13 @@ private:
 
     Direction m_currentDirection;
     std::list<Segment> m_segments;
+
+    void HandleToEatFood();
+    void set_direction(const Direction &direction);
+    void FoodRespPosition(const FoodResp &requestedFood);
+    void CheckSnakeEatsFood(const FoodInd &receivedFood);
+    bool CollisionWithMyself(const Segment &newhead);
+    bool ControllWeHitSomeoneIfNotChangeCoords(Segment& newHead);
 };
 
 } // namespace Snake
